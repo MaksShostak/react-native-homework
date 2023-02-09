@@ -5,9 +5,18 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
-export const Registration = ({ hideKeyboard, showKeyboard, navigation }) => {
+import { Background } from "../components/Background";
+const BackgroundImg = require("../assets/images/Photo.jpg");
+
+export const Registration = ({ navigation }) => {
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +25,13 @@ export const Registration = ({ hideKeyboard, showKeyboard, navigation }) => {
   const emaildHandler = (text) => setEmail(text);
   const passwordHandler = (text) => setPassword(text);
 
+  const hideKeyboard = () => {
+    Keyboard.dismiss();
+    setIsShowKeyboard(false);
+  };
+  const showKeyboard = () => {
+    setIsShowKeyboard(true);
+  };
   const onSubmit = () => {
     console.log(name, email);
     setName("");
@@ -25,49 +41,69 @@ export const Registration = ({ hideKeyboard, showKeyboard, navigation }) => {
   };
 
   return (
-    // <View style={styles.wrapper}>
-    <View style={styles.form}>
-      <Text style={styles.text}>Registration</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={name}
-        onChangeText={nameHandler}
-        onFocus={showKeyboard}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={emaildHandler}
-        onFocus={showKeyboard}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={passwordHandler}
-        onFocus={showKeyboard}
-      />
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.button}
-        onPress={onSubmit}
-      >
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-      <Text style={styles.underButtText}>
-        Already have an account?{" "}
-        <Text onPress={() => navigation.navigate("Login")}>Login</Text>
-      </Text>
+    <View style={styles.wrapper}>
+      <TouchableWithoutFeedback onPress={hideKeyboard}>
+        <Background img={BackgroundImg} styleBtn={styles.background}>
+          {/* <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          > */}
+          <View
+            style={{
+              ...styles.form,
+              marginBottom: isShowKeyboard ? 0 : 0,
+            }}
+          >
+            <Text style={styles.text}>Registration</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={name}
+              onChangeText={nameHandler}
+              onFocus={showKeyboard}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={emaildHandler}
+              onFocus={showKeyboard}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={true}
+              value={password}
+              onChangeText={passwordHandler}
+              onFocus={showKeyboard}
+            />
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.button}
+              onPress={onSubmit}
+            >
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>
+            <Text style={styles.underButtText}>
+              Already have an account?{" "}
+              <Text onPress={() => navigation.navigate("Login")}>Login</Text>
+            </Text>
+          </View>
+          {/* </KeyboardAvoidingView> */}
+        </Background>
+      </TouchableWithoutFeedback>
     </View>
-    // </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // wrapper: { flex: 1, justifyContent: "flex-end", backgroundColor: "red" },
+  wrapper: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+    justifyContent: "flex-end",
+    resizeMode: "cover",
+  },
   form: {
     backgroundColor: "#fff",
     borderTopRightRadius: 25,

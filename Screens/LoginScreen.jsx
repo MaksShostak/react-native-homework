@@ -5,15 +5,23 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import { Background } from "../components/Background";
+const BackgroundImg = require("../assets/images/Photo.jpg");
 
 const initialFormState = {
   email: "",
   password: "",
 };
 
-export const Login = ({ showKeyboard, hideKeyboard, navigation }) => {
+export const Login = ({ navigation }) => {
   const [formState, setFormState] = useState(initialFormState);
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+
   const onChangeEmail = (text) => {
     setFormState((prevformState) => ({
       ...prevformState,
@@ -26,6 +34,13 @@ export const Login = ({ showKeyboard, hideKeyboard, navigation }) => {
       password: text,
     }));
   };
+  const hideKeyboard = () => {
+    Keyboard.dismiss();
+    setIsShowKeyboard(false);
+  };
+  const showKeyboard = () => {
+    setIsShowKeyboard(true);
+  };
   const onSubmit = () => {
     console.log(formState);
     setFormState(initialFormState);
@@ -33,39 +48,64 @@ export const Login = ({ showKeyboard, hideKeyboard, navigation }) => {
   };
 
   return (
-    <View style={styles.form}>
-      <Text style={styles.text}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={onChangeEmail}
-        onFocus={showKeyboard}
-        value={formState.email}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry={true}
-        onChangeText={onChangePass}
-        onFocus={showKeyboard}
-        value={formState.password}
-      />
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.button}
-        onPress={onSubmit}
-      >
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-      <Text style={styles.underButtText}>
-        Don't have an account?{" "}
-        <Text onPress={() => navigation.navigate("Register")}>Register</Text>
-      </Text>
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={hideKeyboard}>
+        <Background img={BackgroundImg} styleBtn={styles.background}>
+          {/* <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          > */}
+          <View
+            style={{
+              ...styles.form,
+              marginBottom: isShowKeyboard ? 0 : 0,
+            }}
+          >
+            <Text style={styles.text}>Login</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              onChangeText={onChangeEmail}
+              onFocus={showKeyboard}
+              value={formState.email}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={true}
+              onChangeText={onChangePass}
+              onFocus={showKeyboard}
+              value={formState.password}
+            />
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.button}
+              onPress={onSubmit}
+            >
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+            <Text style={styles.underButtText}>
+              Don't have an account?{" "}
+              <Text onPress={() => navigation.navigate("Register")}>
+                Register
+              </Text>
+            </Text>
+          </View>
+          {/* </KeyboardAvoidingView> */}
+        </Background>
+      </TouchableWithoutFeedback>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+    justifyContent: "flex-end",
+    resizeMode: "cover",
+  },
   form: {
     backgroundColor: "#fff",
     borderTopRightRadius: 25,
