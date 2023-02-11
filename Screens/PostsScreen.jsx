@@ -99,11 +99,9 @@ export const PostsScreen = ({ navigation, route }) => {
                       size={24}
                       color="black"
                       onPress={() => {
-                        const latitude = item.location.slice(13).split(" ")[0];
-                        const longitude = item.location.slice(13).split(" ")[1];
                         navigation.navigate("MapScreen", {
-                          latitude: latitude,
-                          longitude: longitude,
+                          latitude: item.latitude,
+                          longitude: item.longitude,
                         });
                       }}
                     />

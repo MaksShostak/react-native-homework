@@ -28,21 +28,21 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  // if (!permission) {
-  //   return (
-  //     <View>
-  //       <Text>Grant permission </Text>
-  //     </View>
-  //   );
-  // }
+  if (!permission) {
+    return (
+      <View>
+        <Text>Grant permission </Text>
+      </View>
+    );
+  }
 
-  // if (!permission.granted) {
-  //   return (
-  //     <View>
-  //       <Text>Access is denied</Text>
-  //     </View>
-  //   );
-  // }
+  if (!permission.granted) {
+    return (
+      <View>
+        <Text>Access is denied</Text>
+      </View>
+    );
+  }
 
   const toggleCameraType = () => {
     setType((current) =>
@@ -52,16 +52,16 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const useCamera = async () => {
     const { uri } = await camera.takePictureAsync();
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync({});
     if (status !== "granted") {
       alert("Permission to access location was denied");
       return;
     }
-    let locat = await Location.getCurrentPositionAsync({});
+    let locat = await Location.getCurrentPositionAsync();
     const lat = JSON.stringify(locat.coords.latitude);
     const long = JSON.stringify(locat.coords.longitude);
-    setLatitude(a);
-    setLongitude(b);
+    setLatitude(lat);
+    setLongitude(long);
 
     setPhoto(uri);
     const coords = `yours coords ${lat} ${long}`;
@@ -74,7 +74,13 @@ export const CreatePostsScreen = ({ navigation }) => {
   const locationHandler = (text) => setLocation(text);
 
   const onSubmit = () => {
-    navigation.navigate("PostsScreen", { photo, title, location });
+    navigation.navigate("PostsScreen", {
+      photo,
+      title,
+      location,
+      longitude,
+      latitude,
+    });
     setTitle("");
     setLocation("");
   };
