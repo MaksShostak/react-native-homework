@@ -1,4 +1,4 @@
-import { Home } from "./Home";
+import { HomeScreen } from "./Home";
 import { CommentsScreen } from "./CommentsScreen";
 import { CreatePostsScreen } from "./CreatePostsScreen";
 import { Login } from "./LoginScreen";
@@ -7,7 +7,7 @@ import { PostsScreen } from "./PostsScreen";
 import { ProfileScreen } from "./ProfileScreen";
 import { Registration } from "./RegistrationScreen";
 export {
-  Home,
+  HomeScreen,
   CommentsScreen,
   CreatePostsScreen,
   Login,
