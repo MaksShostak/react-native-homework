@@ -1,5 +1,7 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { useState, useEffect } from "react";
+import { Provider, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistor, store } from "./reduxToolkit/store";
 
 import * as SplashScreen from "expo-splash-screen";
 
@@ -13,11 +15,9 @@ import {
 } from "@expo-google-fonts/roboto";
 import { Pacifico_400Regular } from "@expo-google-fonts/pacifico";
 
-import { useRoute } from "./components/router";
+import { Main } from "./components/Main";
 
 export default function App() {
-  const routing = useRoute(1);
-
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
@@ -33,5 +33,11 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-  return <NavigationContainer>{routing}</NavigationContainer>;
+  return (
+    <Provider store={store}>
+      {/* <PersistGate loading={null} persistor={persistor}> */}
+      <Main />
+      {/* </PersistGate> */}
+    </Provider>
+  );
 }

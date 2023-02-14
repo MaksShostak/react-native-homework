@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "514317442461",
+    "project_id": "postsimg",
+    "storage_bucket": "postsimg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514317442461:android:a45eb9c65997af99c1a374",
+        "android_client_info": {
+          "package_name": "maks.posts.img"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "514317442461-0agn4js21dqdc2rdiu4j8hrcrc2806ju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB006QJKPrb5ebM0pHdnvg1knBslKbVVCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "514317442461-0agn4js21dqdc2rdiu4j8hrcrc2806ju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

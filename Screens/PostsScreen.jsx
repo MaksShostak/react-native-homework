@@ -78,7 +78,9 @@ export const PostsScreen = ({ navigation, route }) => {
                       left: 16,
                     }}
                     onPress={() => {
-                      navigation.navigate("CommentsScreen");
+                      navigation.navigate("CommentsScreen", {
+                        photoURL: item.photo,
+                      });
                     }}
                   />
                   <EvilIcons

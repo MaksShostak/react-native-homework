@@ -1,16 +1,18 @@
 import { Text, View, StyleSheet } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { AntDesign } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-const Tabs = createBottomTabNavigator();
+import { AntDesign, MaterialIcons, Feather } from "@expo/vector-icons";
 
+const Tabs = createBottomTabNavigator();
+import { authLogout } from "../reduxToolkit/auth/operations-auth";
 import { PostsScreen } from "./PostsScreen";
 import { CreatePostsScreen } from "./CreatePostsScreen";
 import { ProfileScreen } from "./ProfileScreen";
+import { useDispatch } from "react-redux";
 
 export const HomeScreen = () => {
+  const diispatch = useDispatch();
+  const logOut = () => diispatch(authLogout());
   return (
     <Tabs.Navigator
       initialRouteName="PostsScreen"
@@ -71,7 +73,7 @@ export const HomeScreen = () => {
                 name="log-out"
                 size={24}
                 color="black"
-                onPress={() => alert("This is a button!")}
+                onPress={logOut}
               />
             </View>
           ),

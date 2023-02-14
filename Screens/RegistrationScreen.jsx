@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { authRegister } from "../reduxToolkit/auth/operations-auth";
+import { useDispatch } from "react-redux";
+
 import {
   StyleSheet,
   Text,
@@ -12,14 +15,16 @@ import {
 } from "react-native";
 
 import { Background } from "../components/Background";
+
 const BackgroundImg = require("../assets/images/Photo.jpg");
 
 export const Registration = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const dispatch = useDispatch();
 
   const nameHandler = (text) => setName(text);
   const emaildHandler = (text) => setEmail(text);
@@ -32,8 +37,10 @@ export const Registration = ({ navigation }) => {
   const showKeyboard = () => {
     setIsShowKeyboard(true);
   };
+
   const onSubmit = () => {
-    console.log(name, email);
+    dispatch(authRegister({ name, email, password }));
+
     setName("");
     setEmail("");
     setPassword("");

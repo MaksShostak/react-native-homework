@@ -1,7 +1,4 @@
-import { Button, View } from "react-native";
-
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import {
   HomeScreen,
@@ -12,7 +9,6 @@ import {
 } from "../Screens";
 
 const Stack = createNativeStackNavigator();
-const Tabs = createBottomTabNavigator();
 
 export const useRoute = (isLogged) => {
   if (!isLogged) {

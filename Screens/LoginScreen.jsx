@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { authLogin } from "../reduxToolkit/auth/operations-auth";
+import { useDispatch } from "react-redux";
 import {
   StyleSheet,
   Text,
@@ -10,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+
 import { Background } from "../components/Background";
 const BackgroundImg = require("../assets/images/Photo.jpg");
 
@@ -21,6 +24,7 @@ const initialFormState = {
 export const Login = ({ navigation }) => {
   const [formState, setFormState] = useState(initialFormState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const dispatch = useDispatch();
 
   const onChangeEmail = (text) => {
     setFormState((prevformState) => ({
@@ -42,7 +46,7 @@ export const Login = ({ navigation }) => {
     setIsShowKeyboard(true);
   };
   const onSubmit = () => {
-    console.log(formState);
+    dispatch(authLogin(formState));
     setFormState(initialFormState);
     hideKeyboard();
   };

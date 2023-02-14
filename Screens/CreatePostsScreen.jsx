@@ -28,21 +28,21 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  if (!permission) {
-    return (
-      <View>
-        <Text>Grant permission </Text>
-      </View>
-    );
-  }
+  // if (!permission) {
+  //   return (
+  //     <View>
+  //       <Text>Grant permission </Text>
+  //     </View>
+  //   );
+  // }
 
-  if (!permission.granted) {
-    return (
-      <View>
-        <Text>Access is denied</Text>
-      </View>
-    );
-  }
+  // if (!permission.granted) {
+  //   return (
+  //     <View>
+  //       <Text>Access is denied</Text>
+  //     </View>
+  //   );
+  // }
 
   const toggleCameraType = () => {
     setType((current) =>
@@ -57,7 +57,7 @@ export const CreatePostsScreen = ({ navigation }) => {
       alert("Permission to access location was denied");
       return;
     }
-    let locat = await Location.getCurrentPositionAsync();
+    const locat = await Location.getCurrentPositionAsync();
     const lat = JSON.stringify(locat.coords.latitude);
     const long = JSON.stringify(locat.coords.longitude);
     setLatitude(lat);
