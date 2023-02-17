@@ -1,8 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
+
 import { authStateChangeUser } from "../reduxToolkit/auth/operations-auth";
 
 import { useRoute } from "./router";

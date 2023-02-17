@@ -1,7 +1,10 @@
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import * as Location from "expo-location";
-
+import { nanoid } from "nanoid";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
 import {
   FontAwesome,
   AntDesign,
@@ -18,14 +21,19 @@ import {
   TextInput,
 } from "react-native";
 
+import { storage, db } from "../firebase/config";
+import { selectStateAuth } from "../reduxToolkit/auth/selectot-auth";
+
 export const CreatePostsScreen = ({ navigation }) => {
+  const [buttonStyle, setButtonStyle] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [camera, setCamera] = useState(null);
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
+  const [place, setPlace] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
+  const { userId, name } = useSelector(selectStateAuth);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
   // if (!permission) {
@@ -44,6 +52,21 @@ export const CreatePostsScreen = ({ navigation }) => {
   //   );
   // }
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      const location = await Location.getCurrentPositionAsync();
+      const lat = JSON.stringify(location.coords.latitude);
+      const long = JSON.stringify(location.coords.longitude);
+      setLatitude(lat);
+      setLongitude(long);
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+    })();
+  }, []);
+
   const toggleCameraType = () => {
     setType((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back
@@ -52,37 +75,59 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const useCamera = async () => {
     const { uri } = await camera.takePictureAsync();
-    const { status } = await Location.requestForegroundPermissionsAsync({});
-    if (status !== "granted") {
-      alert("Permission to access location was denied");
-      return;
-    }
-    const locat = await Location.getCurrentPositionAsync();
-    const lat = JSON.stringify(locat.coords.latitude);
-    const long = JSON.stringify(locat.coords.longitude);
-    setLatitude(lat);
-    setLongitude(long);
-
     setPhoto(uri);
-    const coords = `yours coords ${lat} ${long}`;
-    setLocation(coords);
-
-    console.log({ longitude, latitude });
+  };
+  const uploadPhotoToServer = async () => {
+    try {
+      const response = await fetch(photo);
+      const file = await response.blob();
+      const id = nanoid();
+      const storageRef = ref(storage, `postImage/${id}`);
+      await uploadBytes(storageRef, file);
+      const processedPhoto = await getDownloadURL(
+        ref(storage, `postImage/${id}`)
+      );
+      return processedPhoto;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const titleHandler = (text) => setTitle(text);
-  const locationHandler = (text) => setLocation(text);
+  const placeHandler = (text) => setPlace(text);
 
   const onSubmit = () => {
-    navigation.navigate("PostsScreen", {
-      photo,
-      title,
-      location,
-      longitude,
-      latitude,
-    });
+    uploadPostsToServer();
+    navigation.navigate("PostsScreen");
     setTitle("");
-    setLocation("");
+    setPlace("");
+    setButtonStyle(false);
+  };
+  const uploadPostsToServer = async () => {
+    const photo = await uploadPhotoToServer();
+    try {
+      const docRef = await addDoc(collection(db, "posts"), {
+        photo,
+        title,
+        latitude,
+        longitude,
+        userId,
+        name,
+        place,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+  const changeButtonStyle = () => {
+    setButtonStyle(true);
+  };
+  const clearAllFields = () => {
+    setPhoto(null);
+    setTitle("");
+    setPlace("");
+    setButtonStyle(false);
   };
 
   return (
@@ -117,13 +162,15 @@ export const CreatePostsScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Title"
           onChangeText={titleHandler}
+          onFocus={changeButtonStyle}
         />
 
         <TextInput
-          value={location}
+          value={place}
           style={{ ...styles.input, paddingLeft: 24 }}
           placeholder="Location"
-          // onChangeText={locationHandler}
+          onChangeText={placeHandler}
+          onFocus={changeButtonStyle}
         />
         <EvilIcons
           name="location"
@@ -137,15 +184,28 @@ export const CreatePostsScreen = ({ navigation }) => {
 
         <TouchableOpacity
           activeOpacity={0.7}
-          style={styles.button}
+          style={{
+            ...styles.button,
+            backgroundColor: buttonStyle ? "#FF6C00" : "#F6F6F6",
+          }}
           onPress={onSubmit}
         >
-          <Text style={styles.buttonText}>Publish</Text>
+          <Text
+            style={{
+              ...styles.buttonText,
+              color: buttonStyle ? "#FFFFFF" : "#BDBDBD",
+            }}
+          >
+            Publish
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
-          style={styles.buttonDel}
-          onPress={() => {}}
+          style={{
+            ...styles.buttonDel,
+            backgroundColor: buttonStyle ? "#FF6C00" : "#F6F6F6",
+          }}
+          onPress={clearAllFields}
         >
           <AntDesign name="delete" size={24} color="black" sty />
         </TouchableOpacity>
@@ -218,7 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   button: {
-    backgroundColor: "#FF6C00",
     borderRadius: 100,
     marginHorizontal: 16,
     marginTop: 32,
@@ -226,7 +285,7 @@ const styles = StyleSheet.create({
   buttonText: {
     paddingTop: 16,
     paddingBottom: 16,
-    color: "#FFFFFF",
+
     fontSize: 16,
     textAlign: "center",
   },

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { EvilIcons } from "@expo/vector-icons";
+import { EvilIcons, FontAwesome } from "@expo/vector-icons";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 
 import {
   Text,
@@ -10,17 +11,36 @@ import {
   SafeAreaView,
 } from "react-native";
 
-import { Background } from "../components/Background";
-const BackgroundImg = require("../assets/images/Photo.jpg");
+import { db } from "../firebase/config";
+import { useSelector } from "react-redux";
+import { selectStateAuth } from "../reduxToolkit/auth/selectot-auth";
 
-export const PostsScreen = ({ navigation, route }) => {
+export const PostsScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
+  const { avatar, name, email } = useSelector(selectStateAuth);
+  const getAllPosts = () => {
+    const post = [];
+    const unsub = onSnapshot(collection(db, "posts"), (snapshot) => {
+      snapshot.forEach((doc) => {
+        post.push({ ...doc.data(), id: doc.id });
+      });
+      setPosts(post);
+    });
+  };
+
+  // const getAllPosts = async () => {
+  //   let post = [];
+  //   const querySnapshot = await getDocs(collection(db, "posts"));
+  //   querySnapshot.forEach((doc) => {
+  //     post.push({ ...doc.data(), id: doc.id });
+  //   });
+
+  //   setPosts(post);
+  // };
 
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
-    }
-  }, [route.params]);
+    getAllPosts();
+  }, []);
 
   return (
     <SafeAreaView
@@ -28,74 +48,66 @@ export const PostsScreen = ({ navigation, route }) => {
         flex: 1,
       }}
     >
-      <Background img={BackgroundImg} styleBtn={styles.background}>
+      <View style={styles.listContainer}>
+        <View style={styles.avatarContainer}>
+          <Image style={styles.avatar} source={{ uri: avatar }} />
+
+          <View>
+            <Text
+              style={styles.userName}
+              onPress={() => {
+                console.log("click");
+                navigation.navigate("ProfileScreen");
+              }}
+            >
+              {name}
+            </Text>
+            <Text style={styles.userEmail}>{email}</Text>
+          </View>
+        </View>
         <FlatList
-          style={{
-            borderTopLeftRadius: 25,
-            borderTopRightRadius: 25,
-            backgroundColor: "white",
-          }}
           data={posts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
             return (
               <View style={styles.container}>
-                <Image
-                  source={{ uri: item.photo }}
-                  style={{
-                    height: 240,
-                    marginTop: 32,
-                    borderRadius: 8,
-                    marginHorizontal: 16,
-                  }}
-                />
-                <View
-                  style={{
-                    height: 20,
-                    marginTop: 8,
-                  }}
-                >
+                <Image source={{ uri: item.photo }} style={styles.image} />
+                <View style={{ marginTop: 8, marginHorizontal: 16 }}>
                   <Text
-                    style={{ alignSelf: "flex-start", marginHorizontal: 16 }}
+                    style={{
+                      alignSelf: "flex-start",
+                      fontSize: 16,
+                      fontFamily: "Roboto_500Medium",
+                    }}
                   >
                     {item.title}
                   </Text>
                 </View>
-                <View
-                  style={{
-                    height: 20,
-                    marginTop: 8,
-                  }}
-                >
-                  <EvilIcons
-                    name="comment"
-                    size={24}
-                    color="black"
-                    style={{
-                      // backgroundColor: "green",
-                      position: "absolute",
-                      top: 0,
-                      left: 16,
-                    }}
-                    onPress={() => {
-                      navigation.navigate("CommentsScreen", {
-                        photoURL: item.photo,
-                      });
-                    }}
-                  />
-                  <EvilIcons
-                    name="like"
-                    size={24}
-                    color="#FF6C00"
-                    style={{ position: "absolute", top: 0, left: 80 }}
-                  />
-                  <Text
-                    style={{
-                      alignSelf: "flex-end",
-                      marginHorizontal: 16,
-                      textDecorationLine: "underline",
-                    }}
-                  >
+                <View style={styles.iconsContainer}>
+                  <View style={{ flexDirection: "row" }}>
+                    <FontAwesome
+                      name="comment-o"
+                      size={24}
+                      color="black"
+                      style={{}}
+                      onPress={() => {
+                        navigation.navigate("CommentsScreen", {
+                          postId: item.id,
+                          photoURL: item.photo,
+                        });
+                      }}
+                    />
+                    <Text style={{ marginLeft: 6 }}> 0 </Text>
+
+                    {/* <EvilIcons
+                      name="like"
+                      size={24}
+                      color="#FF6C00"
+                      style={{ marginLeft: 24 }}
+                    />
+                    <Text style={{ marginLeft: 6 }}> {0} </Text> */}
+                  </View>
+                  <View style={{ flexDirection: "row" }}>
                     <EvilIcons
                       name="location"
                       size={24}
@@ -107,24 +119,65 @@ export const PostsScreen = ({ navigation, route }) => {
                         });
                       }}
                     />
-                    {item.location}
-                  </Text>
+                    <Text
+                      style={{
+                        marginLeft: 4,
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {item.place}
+                    </Text>
+                  </View>
                 </View>
               </View>
             );
           }}
         />
-      </Background>
+      </View>
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
+  avatarContainer: {
+    flexDirection: "row",
+    marginBottom: 32,
+    marginHorizontal: 16,
+    alignItems: "center",
+  },
+  userName: {
+    fontSize: 13,
+    fontFamily: "Roboto_900Black",
+  },
+  userEmail: {
+    fontSize: 11,
+    fontFamily: "Roboto_400Regular",
+  },
+  avatar: {
+    height: 60,
+    width: 60,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+
+  listContainer: {
+    backgroundColor: "white",
+    paddingTop: 32,
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
-  background: {
-    flex: 1,
-    resizeMode: "cover",
-    paddingTop: 100,
+  iconsContainer: {
+    marginHorizontal: 16,
+    flexDirection: "row",
+    marginTop: 8,
+    marginBottom: 32,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+  },
+  image: {
+    height: 240,
+    borderRadius: 8,
+    marginHorizontal: 16,
   },
 });

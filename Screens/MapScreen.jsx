@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useEffect, useState } from "react";
 
@@ -27,15 +27,14 @@ export const MapScreen = ({ route }) => {
           mapType="standard"
           minZoomLevel={15}
           onMapReady={() => console.log("Map is ready")}
-          onRegionChange={() => console.log("Region change")}
         >
           <Marker
-            title="I am here"
+            title="travel photo"
             coordinate={{
               latitude: latitude,
               longitude: longitude,
             }}
-            description="Hello"
+            description="the photo was taken here"
           />
         </MapView>
       </View>

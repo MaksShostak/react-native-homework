@@ -27,7 +27,6 @@ export const HomeScreen = () => {
           } else if (route.name === "CreatePostsScreen") {
             iconName = focused ? "plus" : "plus";
             // color = "white";
-
             background = "#FF6C00";
             borderRadius = 20;
           } else if (route.name === "ProfileScreen") {

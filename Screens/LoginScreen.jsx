@@ -22,6 +22,8 @@ const initialFormState = {
 };
 
 export const Login = ({ navigation }) => {
+  const [imputBorderEmail, setImputBorderEmail] = useState(false);
+  const [imputBorderPass, setImputBorderPass] = useState(false);
   const [formState, setFormState] = useState(initialFormState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const dispatch = useDispatch();
@@ -41,9 +43,17 @@ export const Login = ({ navigation }) => {
   const hideKeyboard = () => {
     Keyboard.dismiss();
     setIsShowKeyboard(false);
+    setImputBorderEmail(false);
+    setImputBorderPass(false);
   };
-  const showKeyboard = () => {
+
+  const onImputChangeEmail = () => {
     setIsShowKeyboard(true);
+    setImputBorderEmail(true);
+  };
+  const onImputChangePass = () => {
+    setIsShowKeyboard(true);
+    setImputBorderPass(true);
   };
   const onSubmit = () => {
     dispatch(authLogin(formState));
@@ -53,11 +63,11 @@ export const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={hideKeyboard}>
-        <Background img={BackgroundImg} styleBtn={styles.background}>
-          {/* <KeyboardAvoidingView
+      <Background img={BackgroundImg} styleBtn={styles.background}>
+        {/* <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           > */}
+        <TouchableWithoutFeedback onPress={hideKeyboard}>
           <View
             style={{
               ...styles.form,
@@ -66,26 +76,42 @@ export const Login = ({ navigation }) => {
           >
             <Text style={styles.text}>Login</Text>
             <TextInput
-              style={styles.input}
+              style={{
+                ...styles.input,
+                borderColor: imputBorderEmail ? "#FF6C00" : "#E8E8E8",
+              }}
               placeholder="Email"
               onChangeText={onChangeEmail}
-              onFocus={showKeyboard}
+              onFocus={onImputChangeEmail}
               value={formState.email}
             />
             <TextInput
-              style={styles.input}
+              style={{
+                ...styles.input,
+                borderColor: imputBorderPass ? "#FF6C00" : "#E8E8E8",
+              }}
               placeholder="Password"
               secureTextEntry={true}
               onChangeText={onChangePass}
-              onFocus={showKeyboard}
+              onFocus={onImputChangePass}
               value={formState.password}
             />
             <TouchableOpacity
               activeOpacity={0.7}
-              style={styles.button}
+              style={{
+                ...styles.button,
+                backgroundColor: isShowKeyboard ? "#FF6C00" : "#F6F6F6",
+              }}
               onPress={onSubmit}
             >
-              <Text style={styles.buttonText}>Login</Text>
+              <Text
+                style={{
+                  ...styles.buttonText,
+                  color: isShowKeyboard ? "#FFFFFF" : "#BDBDBD",
+                }}
+              >
+                Login
+              </Text>
             </TouchableOpacity>
             <Text style={styles.underButtText}>
               Don't have an account?{" "}
@@ -95,8 +121,8 @@ export const Login = ({ navigation }) => {
             </Text>
           </View>
           {/* </KeyboardAvoidingView> */}
-        </Background>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </Background>
     </View>
   );
 };
@@ -117,7 +143,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#E8E8E8",
+
     borderRadius: 8,
     backgroundColor: "#F6F6F6",
     height: 50,
@@ -136,7 +162,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#FF6C00",
     borderRadius: 100,
     marginHorizontal: 16,
     marginTop: 43,
@@ -144,7 +169,7 @@ const styles = StyleSheet.create({
   buttonText: {
     paddingTop: 16,
     paddingBottom: 16,
-    color: "#FFFFFF",
+
     fontSize: 16,
     textAlign: "center",
   },

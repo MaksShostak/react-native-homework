@@ -1,7 +1,7 @@
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { useEffect } from "react";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./reduxToolkit/store";
+
+import { store } from "./reduxToolkit/store";
 
 import * as SplashScreen from "expo-splash-screen";
 
@@ -35,9 +35,7 @@ export default function App() {
   }
   return (
     <Provider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
       <Main />
-      {/* </PersistGate> */}
     </Provider>
   );
 }

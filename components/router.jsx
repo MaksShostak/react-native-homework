@@ -45,7 +45,7 @@ export const useRoute = (isLogged) => {
         name="CommentsScreen"
         component={CommentsScreen}
         options={{
-          title: "CommentsScreen",
+          title: "Comments",
           headerStyle: {
             backgroundColor: "#ffffff",
           },
@@ -56,7 +56,7 @@ export const useRoute = (isLogged) => {
         name="MapScreen"
         component={MapScreen}
         options={{
-          title: "MapScreen",
+          title: "Map",
           headerStyle: {
             backgroundColor: "#ffffff",
           },
