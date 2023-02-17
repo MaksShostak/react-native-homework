@@ -18,6 +18,11 @@ import { selectStateAuth } from "../reduxToolkit/auth/selectot-auth";
 export const PostsScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const { avatar, name, email } = useSelector(selectStateAuth);
+
+  useEffect(() => {
+    getAllPosts();
+  }, []);
+
   const getAllPosts = () => {
     const post = [];
     const unsub = onSnapshot(collection(db, "posts"), (snapshot) => {
@@ -38,10 +43,6 @@ export const PostsScreen = ({ navigation }) => {
   //   setPosts(post);
   // };
 
-  useEffect(() => {
-    getAllPosts();
-  }, []);
-
   return (
     <SafeAreaView
       style={{
@@ -56,7 +57,6 @@ export const PostsScreen = ({ navigation }) => {
             <Text
               style={styles.userName}
               onPress={() => {
-                console.log("click");
                 navigation.navigate("ProfileScreen");
               }}
             >

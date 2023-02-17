@@ -33,6 +33,11 @@ export const ProfileScreen = ({ navigation }) => {
 
   const { name, userId, avatar } = useSelector(selectStateAuth);
   const diispatch = useDispatch();
+
+  useEffect(() => {
+    getUserPosts();
+  }, []);
+
   const logOut = () => diispatch(authLogout());
 
   const countComment = (id) => {
@@ -43,7 +48,6 @@ export const ProfileScreen = ({ navigation }) => {
       querySnapshot.forEach((doc) => {
         comments.push({ ...doc.data(), id: doc.id });
       });
-      console.log(comments.length);
       return comments.length;
     });
 
@@ -81,10 +85,6 @@ export const ProfileScreen = ({ navigation }) => {
     });
   };
 
-  useEffect(() => {
-    getUserPosts();
-  }, []);
-  console.log(userPosts);
   return (
     <SafeAreaView
       style={{
@@ -136,7 +136,6 @@ export const ProfileScreen = ({ navigation }) => {
                         color="#FF6C00"
                         style={{}}
                         onPress={() => {
-                          console.log("click");
                           navigation.navigate("CommentsScreen", {
                             postId: item.id,
                             photoURL: item.photo,

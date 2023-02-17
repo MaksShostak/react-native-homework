@@ -17,16 +17,18 @@ import {
   getDocs,
   collection,
   Timestamp,
+  onSnapshot,
+  query,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 
-export const CommentsScreen = ({ route }) => {
+export const CommentsScreen = ({ navigation, route }) => {
   const [comments, setComents] = useState([]);
   const [inputComent, setInputComent] = useState("");
   const avatar = useSelector(selectAvatat);
   const userId = useSelector(selectUserId);
   const { postId } = route.params;
-  console.log(comments);
+
   useEffect(() => {
     getAllComments();
   }, []);
@@ -44,15 +46,26 @@ export const CommentsScreen = ({ route }) => {
 
     setInputComent("");
   };
-  const getAllComments = async () => {
-    const wayToPosts = doc(db, "posts", postId);
-    let comments = [];
-    const querySnapshot = await getDocs(collection(wayToPosts, "comments"));
-    querySnapshot.forEach((doc) => {
-      comments.push({ ...doc.data(), id: doc.id });
-    });
+  // const getAllComments = async () => {
+  //   const wayToPosts = doc(db, "posts", postId);
+  //   let comments = [];
+  //   const querySnapshot = await getDocs(collection(wayToPosts, "comments"));
+  //   querySnapshot.forEach((doc) => {
+  //     comments.push({ ...doc.data(), id: doc.id });
+  //   });
 
-    setComents(comments);
+  //   setComents(comments);
+  // };
+  const getAllComments = () => {
+    const wayToPosts = doc(db, "posts", postId);
+    const q = query(collection(wayToPosts, "comments"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const comments = [];
+      querySnapshot.forEach((doc) => {
+        comments.push({ ...doc.data(), id: doc.id });
+      });
+      setComents(comments);
+    });
   };
 
   return (
@@ -78,7 +91,7 @@ export const CommentsScreen = ({ route }) => {
           renderItem={({ item }) => {
             return (
               <View style={styles.commentContainer}>
-                <View
+                <TouchableOpacity
                   style={{
                     height: 28,
                     width: 28,
@@ -86,12 +99,16 @@ export const CommentsScreen = ({ route }) => {
                     borderWidth: 1,
                     marginRight: 16,
                   }}
+                  onPress={() => {
+                    console.log("click");
+                    navigation.navigate("ProfileScreen");
+                  }}
                 >
                   <Image
                     source={{ uri: item.userAvatar }}
                     style={{ width: 28, height: 28, borderRadius: 100 }}
                   />
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.commentTextContainer}>
                   <Text
@@ -113,9 +130,12 @@ export const CommentsScreen = ({ route }) => {
 
       <View
         style={{
-          marginHorizontal: 16,
           marginTop: 6,
-          marginBottom: 16,
+          width: "100%",
+          position: "absolute",
+          bottom: 16,
+          marginRight: 16,
+          // marginLeft: 16,
         }}
       >
         <TextInput
@@ -143,6 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   input: {
+    marginHorizontal: 16,
     borderWidth: 1,
     borderColor: "#E8E8E8",
     borderRadius: 100,
@@ -157,7 +178,8 @@ const styles = StyleSheet.create({
   button: {
     position: "absolute",
     top: 24,
-    right: 8,
+    right: 24,
+
     height: 34,
     width: 34,
     backgroundColor: "#FF6C00",
