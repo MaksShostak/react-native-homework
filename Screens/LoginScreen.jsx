@@ -9,8 +9,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 
 import { Background } from "../components/Background";
@@ -64,9 +62,6 @@ export const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Background img={BackgroundImg} styleBtn={styles.background}>
-        {/* <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-          > */}
         <TouchableWithoutFeedback onPress={hideKeyboard}>
           <View
             style={{
@@ -120,7 +115,6 @@ export const Login = ({ navigation }) => {
               </Text>
             </Text>
           </View>
-          {/* </KeyboardAvoidingView> */}
         </TouchableWithoutFeedback>
       </Background>
     </View>

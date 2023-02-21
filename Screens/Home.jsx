@@ -1,14 +1,14 @@
-import { Text, View, StyleSheet } from "react-native";
+import { View } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign, MaterialIcons, Feather } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
 
 const Tabs = createBottomTabNavigator();
 import { authLogout } from "../reduxToolkit/auth/operations-auth";
 import { PostsScreen } from "./PostsScreen";
 import { CreatePostsScreen } from "./CreatePostsScreen";
 import { ProfileScreen } from "./ProfileScreen";
-import { useDispatch } from "react-redux";
 
 export const HomeScreen = () => {
   const diispatch = useDispatch();

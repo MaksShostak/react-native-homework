@@ -1,10 +1,8 @@
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
-import { nanoid } from "nanoid";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
+
 import {
   FontAwesome,
   AntDesign,
@@ -21,12 +19,13 @@ import {
   TextInput,
 } from "react-native";
 
-import { storage, db } from "../firebase/config";
-import { selectStateAuth } from "../reduxToolkit/auth/selectot-auth";
+import { selectStateAuth } from "../reduxToolkit/auth/selector-auth";
+import { uploadPhotoToServerBlob } from "../components/uploadPhoto";
+import { createPost } from "../reduxToolkit/dashboard/oparations-posts";
 
 export const CreatePostsScreen = ({ navigation }) => {
   const [buttonStyle, setButtonStyle] = useState(false);
-  const [photo, setPhoto] = useState(null);
+  const [image, setImage] = useState(null);
   const [camera, setCamera] = useState(null);
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState(null);
@@ -36,6 +35,8 @@ export const CreatePostsScreen = ({ navigation }) => {
   const { userId, name } = useSelector(selectStateAuth);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
+  const dispatch = useDispatch();
+
   // if (!permission) {
   //   return (
   //     <View>
@@ -75,38 +76,16 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const useCamera = async () => {
     const { uri } = await camera.takePictureAsync();
-    setPhoto(uri);
-  };
-  const uploadPhotoToServer = async () => {
-    try {
-      const response = await fetch(photo);
-      const file = await response.blob();
-      const id = nanoid();
-      const storageRef = ref(storage, `postImage/${id}`);
-      await uploadBytes(storageRef, file);
-      const processedPhoto = await getDownloadURL(
-        ref(storage, `postImage/${id}`)
-      );
-      return processedPhoto;
-    } catch (error) {
-      console.error(error);
-    }
+    setImage(uri);
   };
 
   const titleHandler = (text) => setTitle(text);
   const placeHandler = (text) => setPlace(text);
 
-  const onSubmit = () => {
-    uploadPostsToServer();
-    navigation.navigate("PostsScreen");
-    setTitle("");
-    setPlace("");
-    setButtonStyle(false);
-  };
-  const uploadPostsToServer = async () => {
-    const photo = await uploadPhotoToServer();
-    try {
-      const docRef = await addDoc(collection(db, "posts"), {
+  const onSubmit = async () => {
+    const photo = await uploadPhotoToServerBlob(image);
+    dispatch(
+      createPost({
         photo,
         title,
         latitude,
@@ -114,12 +93,15 @@ export const CreatePostsScreen = ({ navigation }) => {
         userId,
         name,
         place,
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+      })
+    );
+
+    navigation.navigate("PostsScreen");
+    setTitle("");
+    setPlace("");
+    setButtonStyle(false);
   };
+
   const changeButtonStyle = () => {
     setButtonStyle(true);
   };
@@ -145,7 +127,7 @@ export const CreatePostsScreen = ({ navigation }) => {
             </View>
             {camera && (
               <View style={styles.imageWrapper}>
-                <Image source={{ uri: photo }} style={styles.image} />
+                <Image source={{ uri: image }} style={styles.image} />
               </View>
             )}
             <TouchableOpacity style={styles.container} onPress={useCamera}>

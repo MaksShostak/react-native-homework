@@ -30,3 +30,19 @@ export const uploadPhotoToServer = async (photo) => {
     console.error(error);
   }
 };
+
+export const uploadPhotoToServerBlob = async (photo) => {
+  try {
+    const response = await fetch(photo);
+    const file = await response.blob();
+    const id = nanoid();
+    const storageRef = ref(storage, `postImage/${id}`);
+    await uploadBytes(storageRef, file);
+    const processedPhoto = await getDownloadURL(
+      ref(storage, `postImage/${id}`)
+    );
+    return processedPhoto;
+  } catch (error) {
+    console.error(error);
+  }
+};

@@ -9,65 +9,34 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
-import { selectAvatat, selectUserId } from "../reduxToolkit/auth/selectot-auth";
+import { useDispatch, useSelector } from "react-redux";
+
+import { selectAvatar, selectUserId } from "../reduxToolkit/auth/selector-auth";
+import { selectComments } from "../reduxToolkit/dashboard/selector-posts";
 import {
-  doc,
-  addDoc,
-  getDocs,
-  collection,
-  Timestamp,
-  onSnapshot,
-  query,
-} from "firebase/firestore";
-import { db } from "../firebase/config";
+  getUpdatedComments,
+  updatePost,
+} from "../reduxToolkit/dashboard/oparations-posts";
 
 export const CommentsScreen = ({ navigation, route }) => {
-  const [comments, setComents] = useState([]);
   const [inputComent, setInputComent] = useState("");
-  const avatar = useSelector(selectAvatat);
+  const avatar = useSelector(selectAvatar);
   const userId = useSelector(selectUserId);
   const { postId } = route.params;
+  const comments = useSelector(selectComments);
 
-  useEffect(() => {
-    getAllComments();
-  }, []);
+  const dispatch = useDispatch();
 
   const onChangeInput = (text) => setInputComent(text);
 
-  const createComment = async () => {
-    const wayToPosts = doc(db, "posts", postId);
-    const docRef = await addDoc(collection(wayToPosts, "comments"), {
-      comment: inputComent,
-      userId,
-      userAvatar: avatar,
-      createdat: Timestamp.now().toDate().toLocaleString(),
-    });
+  useEffect(() => {
+    dispatch(getUpdatedComments(postId));
+  }, []);
 
+  const setComment = () => {
+    dispatch(updatePost({ inputComent, avatar, userId, postId }));
     setInputComent("");
   };
-  // const getAllComments = async () => {
-  //   const wayToPosts = doc(db, "posts", postId);
-  //   let comments = [];
-  //   const querySnapshot = await getDocs(collection(wayToPosts, "comments"));
-  //   querySnapshot.forEach((doc) => {
-  //     comments.push({ ...doc.data(), id: doc.id });
-  //   });
-
-  //   setComents(comments);
-  // };
-  const getAllComments = () => {
-    const wayToPosts = doc(db, "posts", postId);
-    const q = query(collection(wayToPosts, "comments"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const comments = [];
-      querySnapshot.forEach((doc) => {
-        comments.push({ ...doc.data(), id: doc.id });
-      });
-      setComents(comments);
-    });
-  };
-
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
@@ -100,7 +69,6 @@ export const CommentsScreen = ({ navigation, route }) => {
                     marginRight: 16,
                   }}
                   onPress={() => {
-                    console.log("click");
                     navigation.navigate("ProfileScreen");
                   }}
                 >
@@ -135,7 +103,6 @@ export const CommentsScreen = ({ navigation, route }) => {
           position: "absolute",
           bottom: 16,
           marginRight: 16,
-          // marginLeft: 16,
         }}
       >
         <TextInput
@@ -148,7 +115,7 @@ export const CommentsScreen = ({ navigation, route }) => {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.button}
-          onPress={createComment}
+          onPress={setComment}
         >
           <AntDesign name="arrowup" size={24} color="white" />
         </TouchableOpacity>

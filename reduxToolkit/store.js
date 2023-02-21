@@ -1,12 +1,12 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 
 import { authSlice } from "./auth/slice-auth";
-// import postsReduser from "./toolkit/posts/slice-contacts";
+
+import postsReducer from "./dashboard/slise-posts";
 
 export const store = configureStore({
   reducer: {
-    // posts: postsReduser,
-
+    posts: postsReducer,
     auth: authSlice.reducer,
   },
 });

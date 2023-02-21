@@ -1,3 +1,6 @@
+import { useDispatch, useSelector } from "react-redux";
+import { EvilIcons, FontAwesome, Feather, AntDesign } from "@expo/vector-icons";
+import { useEffect } from "react";
 import {
   Text,
   View,
@@ -6,84 +9,28 @@ import {
   FlatList,
   Image,
 } from "react-native";
-import { Background } from "../components/Background";
-import {
-  selectAvatat,
-  selectStateAuth,
-  selectUserId,
-} from "../reduxToolkit/auth/selectot-auth";
-import { db } from "../firebase/config";
-import { useDispatch, useSelector } from "react-redux";
-import { EvilIcons, FontAwesome, Feather } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  getDocs,
-  doc,
-} from "firebase/firestore";
-import { authLogout } from "../reduxToolkit/auth/operations-auth";
 
+import { Background } from "../components/Background";
 const BackgroundImg = require("../assets/images/Photo.jpg");
 
-export const ProfileScreen = ({ navigation }) => {
-  const [userPosts, setUserPosts] = useState([]);
+import { selectStateAuth } from "../reduxToolkit/auth/selector-auth";
+import { selectPosts } from "../reduxToolkit/dashboard/selector-posts";
+import { authLogout } from "../reduxToolkit/auth/operations-auth";
+import {
+  featchUsersPosts,
+  deletePost,
+} from "../reduxToolkit/dashboard/oparations-posts";
 
+export const ProfileScreen = ({ navigation }) => {
+  const userPosts = useSelector(selectPosts);
   const { name, userId, avatar } = useSelector(selectStateAuth);
   const diispatch = useDispatch();
 
   useEffect(() => {
-    getUserPosts();
+    diispatch(featchUsersPosts(userId));
   }, []);
 
   const logOut = () => diispatch(authLogout());
-
-  const countComment = (id) => {
-    const wayToPosts = doc(db, "posts", id);
-    const q = query(collection(wayToPosts, "comments"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const comments = [];
-      querySnapshot.forEach((doc) => {
-        comments.push({ ...doc.data(), id: doc.id });
-      });
-      return comments.length;
-    });
-
-    // const querySnapshot = getDocs(collection(wayToPosts, "comments"));
-    // querySnapshot.forEach((doc) => {
-    //   comments.push({ ...doc.data(), id: doc.id });
-    // });
-  };
-
-  // const getUserPosts = async () => {
-  //   let userPosts = [];
-  //   const q = query(collection(db, "posts"), where("userId", "==", userId));
-  //   const querySnapshot = await getDocs(q);
-  //   querySnapshot.forEach((doc) => {
-  //     userPosts.push({
-  //       ...doc.data(),
-  //       id: doc.id,
-  //     });
-  //   });
-  //   setUserPosts(userPosts);
-  // };
-
-  const getUserPosts = () => {
-    const q = query(collection(db, "posts"), where("userId", "==", userId));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const userPosts = [];
-      querySnapshot.forEach((doc) => {
-        userPosts.push({
-          ...doc.data(),
-          id: doc.id,
-          // commentsNumber: countComment(doc.id),
-        });
-      });
-      setUserPosts(userPosts);
-    });
-  };
 
   return (
     <SafeAreaView
@@ -116,7 +63,9 @@ export const ProfileScreen = ({ navigation }) => {
             renderItem={({ item }) => {
               return (
                 <View style={styles.container}>
-                  <Image source={{ uri: item.photo }} style={styles.image} />
+                  {item.photo && (
+                    <Image source={{ uri: item.photo }} style={styles.image} />
+                  )}
                   <View style={{ marginTop: 8, marginHorizontal: 16 }}>
                     <Text
                       style={{
@@ -129,7 +78,9 @@ export const ProfileScreen = ({ navigation }) => {
                     </Text>
                   </View>
                   <View style={styles.iconsContainer}>
-                    <View style={{ flexDirection: "row" }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "baseline" }}
+                    >
                       <FontAwesome
                         name="comment"
                         size={24}
@@ -143,18 +94,31 @@ export const ProfileScreen = ({ navigation }) => {
                         }}
                       />
                       <Text style={{ marginLeft: 6 }}>
-                        {countComment(item.id)}
+                        {item.commentsCount ? item.commentsCount : 0}
                       </Text>
 
-                      <EvilIcons
-                        name="like"
+                      <AntDesign
+                        name="like1"
                         size={24}
                         color="#FF6C00"
                         style={{ marginLeft: 24 }}
                       />
-                      <Text style={{ marginLeft: 6 }}> {0} </Text>
+                      <Text style={{ marginLeft: 6 }}>
+                        {" "}
+                        {item.likes ? item.likes.length : 0}{" "}
+                      </Text>
                     </View>
-                    <View style={{ flexDirection: "row" }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "baseline" }}
+                    >
+                      <AntDesign
+                        name="delete"
+                        size={24}
+                        color="black"
+                        onPress={() => {
+                          diispatch(deletePost({ id: item.id }));
+                        }}
+                      />
                       <EvilIcons
                         name="location"
                         size={24}
@@ -164,6 +128,9 @@ export const ProfileScreen = ({ navigation }) => {
                             latitude: item.latitude,
                             longitude: item.longitude,
                           });
+                        }}
+                        style={{
+                          marginLeft: 8,
                         }}
                       />
                       <Text

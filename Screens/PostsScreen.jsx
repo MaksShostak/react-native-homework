@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { EvilIcons, FontAwesome } from "@expo/vector-icons";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { EvilIcons, FontAwesome, AntDesign } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Text,
@@ -9,39 +9,25 @@ import {
   Image,
   FlatList,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 
-import { db } from "../firebase/config";
-import { useSelector } from "react-redux";
-import { selectStateAuth } from "../reduxToolkit/auth/selectot-auth";
-
+import { selectStateAuth } from "../reduxToolkit/auth/selector-auth";
+import {
+  createLike,
+  featchAllPosts,
+} from "../reduxToolkit/dashboard/oparations-posts";
+import { selectPosts } from "../reduxToolkit/dashboard/selector-posts";
 export const PostsScreen = ({ navigation }) => {
-  const [posts, setPosts] = useState([]);
+  const posts = useSelector(selectPosts);
+  const [like, setLike] = useState(false);
   const { avatar, name, email } = useSelector(selectStateAuth);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    getAllPosts();
+    dispatch(featchAllPosts());
   }, []);
-
-  const getAllPosts = () => {
-    const post = [];
-    const unsub = onSnapshot(collection(db, "posts"), (snapshot) => {
-      snapshot.forEach((doc) => {
-        post.push({ ...doc.data(), id: doc.id });
-      });
-      setPosts(post);
-    });
-  };
-
-  // const getAllPosts = async () => {
-  //   let post = [];
-  //   const querySnapshot = await getDocs(collection(db, "posts"));
-  //   querySnapshot.forEach((doc) => {
-  //     post.push({ ...doc.data(), id: doc.id });
-  //   });
-
-  //   setPosts(post);
-  // };
 
   return (
     <SafeAreaView
@@ -50,28 +36,29 @@ export const PostsScreen = ({ navigation }) => {
       }}
     >
       <View style={styles.listContainer}>
-        <View style={styles.avatarContainer}>
+        <TouchableOpacity
+          style={styles.avatarContainer}
+          onPress={() => {
+            navigation.navigate("ProfileScreen");
+          }}
+        >
           <Image style={styles.avatar} source={{ uri: avatar }} />
 
           <View>
-            <Text
-              style={styles.userName}
-              onPress={() => {
-                navigation.navigate("ProfileScreen");
-              }}
-            >
-              {name}
-            </Text>
+            <Text style={styles.userName}>{name}</Text>
             <Text style={styles.userEmail}>{email}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <FlatList
           data={posts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
             return (
               <View style={styles.container}>
-                <Image source={{ uri: item.photo }} style={styles.image} />
+                {item.photo && (
+                  <Image source={{ uri: item.photo }} style={styles.image} />
+                )}
+
                 <View style={{ marginTop: 8, marginHorizontal: 16 }}>
                   <Text
                     style={{
@@ -97,15 +84,25 @@ export const PostsScreen = ({ navigation }) => {
                         });
                       }}
                     />
-                    <Text style={{ marginLeft: 6 }}> 0 </Text>
-
-                    {/* <EvilIcons
-                      name="like"
+                    <Text style={{ marginLeft: 6 }}>
+                      {" "}
+                      {item.commentsCount ? item.commentsCount : 0}{" "}
+                    </Text>
+                    <AntDesign
+                      name="like1"
                       size={24}
-                      color="#FF6C00"
+                      color={like ? "black" : "#FF6C00"}
                       style={{ marginLeft: 24 }}
+                      onPress={() => {
+                        setLike((previousState) => !previousState);
+                        dispatch(createLike({ postId: item.id, like }));
+                      }}
                     />
-                    <Text style={{ marginLeft: 6 }}> {0} </Text> */}
+
+                    <Text style={{ marginLeft: 6 }}>
+                      {" "}
+                      {item.likes ? item.likes.length : 0}{" "}
+                    </Text>
                   </View>
                   <View style={{ flexDirection: "row" }}>
                     <EvilIcons

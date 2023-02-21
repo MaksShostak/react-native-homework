@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { authStateChangeUser } from "../reduxToolkit/auth/operations-auth";
 
 import { useRoute } from "./router";
-import { selectIsLogin } from "../reduxToolkit/auth/selectot-auth";
+import { selectIsLogin } from "../reduxToolkit/auth/selector-auth";
 
 export const Main = () => {
   const isLogin = useSelector(selectIsLogin);

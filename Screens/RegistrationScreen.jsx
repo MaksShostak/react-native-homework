@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { authRegister } from "../reduxToolkit/auth/operations-auth";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { EvilIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -12,12 +11,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Button,
   Image,
 } from "react-native";
 
+import { authRegister } from "../reduxToolkit/auth/operations-auth";
 import { Background } from "../components/Background";
 
 const BackgroundImg = require("../assets/images/Photo.jpg");
@@ -75,7 +72,16 @@ export const Registration = ({ navigation }) => {
   };
 
   const onSubmit = () => {
-    dispatch(authRegister({ name, email, password, avatar }));
+    dispatch(
+      authRegister({
+        name,
+        email,
+        password,
+        avatar: avatar
+          ? avatar
+          : "https://cojo.ru/wp-content/uploads/2022/12/avatarki-dlia-vatsapa-49.webp",
+      })
+    );
 
     setName("");
     setEmail("");

@@ -1,0 +1,52 @@
+<!doctype html strict>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="application/unimaster; charset=utf-8">
+<meta name="unimaster-openlink" content="88050e0b3fd84296b62398bb4b0c4ce4~book" />
+<meta name="robots" content="noindex, nofollow" />
+<title>UNIMASTER LESSON</title>
+<style>
+body, td {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1.2em;
+	overflow:hidden;
+}
+</style>
+<script>
+window.onload = function() {
+	if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
+		document.getElementById('windows-cell').style.display = 'none';
+	} else {
+		document.getElementById('android-cell').style.display = 'none';
+	}
+}
+</script>
+</head>
+<body>
+
+<table height="100%" width="100%"><tr><td valign="center" align="center">
+<table cellpadding="10" cellspacing="10">
+<tr>
+	<td><img src="/static/images/icon_unimaster_new.png" width="235" height="235" border="0" alt=""></td>
+	<td valign="center" align="left">Для перегляду цього уроку,<br>Вам необхiдно встановити програму UNIMASTER</td>
+</tr>
+<tr id="windows-cell">
+	<td align="right">Версiя для WINDOWS:</td>
+	<td align="center">
+	<a href="https://ugs3experiment.universinet.org/builds/unimaster.exe"><img src="/static/images/download.png" class="appStore" style="max-width: 100%; height: auto;"></a>
+	</td>
+</tr>
+<tr id="android-cell">
+	<td align="right">Версiя для ANDROID:</td>
+	<td align="center">
+	<a href="https://play.google.com/store/apps/details?id=com.Bristar.unimaster"><img src="/static/images/download.png" class="appStore" style="max-width: 100%; height: auto;"></a>
+	</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
