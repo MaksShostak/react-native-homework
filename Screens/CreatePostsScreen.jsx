@@ -37,21 +37,21 @@ export const CreatePostsScreen = ({ navigation }) => {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const dispatch = useDispatch();
 
-  // if (!permission) {
-  //   return (
-  //     <View>
-  //       <Text>Grant permission </Text>
-  //     </View>
-  //   );
-  // }
+  if (!permission) {
+    return (
+      <View>
+        <Text>Grant permission </Text>
+      </View>
+    );
+  }
 
-  // if (!permission.granted) {
-  //   return (
-  //     <View>
-  //       <Text>Access is denied</Text>
-  //     </View>
-  //   );
-  // }
+  if (!permission.granted) {
+    return (
+      <View>
+        <Text>Access is denied</Text>
+      </View>
+    );
+  }
 
   useEffect(() => {
     (async () => {
